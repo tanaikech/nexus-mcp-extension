@@ -12,6 +12,10 @@ Research identifies this phenomenon as "Tool Space Interference (TSI)." When an 
 
 The standard MCP workflow operates by injecting all retrieved metadata (names, descriptions, JSON Schemas) directly into the context window. Nexus-MCP overcomes the scalability limits of this architecture by acting as an intelligent, unified gateway. Instead of exposing the entire toolset to the LLM—which triggers TSI—Nexus-MCP aggregates multiple MCP servers and employs a routing layer. This modular approach preserves model performance by minimizing noise and optimizing information density. The approach described in this article should be understood as one of several strategies for mitigating TSI.
 
+# Repository
+
+[https://github.com/tanaikech/nexus-mcp-extension](https://github.com/tanaikech/nexus-mcp-extension)
+
 # Architecture and Workflow
 
 ![](images/fig1b.jpg)
