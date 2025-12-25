@@ -1,40 +1,47 @@
-# Nexus-MCP: A Unified Gateway for Scalable MCP Server Aggregation
+title: Nexus-MCP: A Unified Gateway for Scalable and Deterministic MCP Server Aggregation
 
 ![](images/fig1.jpg)
 
 # Abstract
 
-Nexus-MCP addresses "Tool Space Interference" in Large Language Models by acting as a unified gateway for multiple MCP servers. By dynamically routing tool requests and filtering context, it enables the use of massive tool ecosystems without sacrificing reasoning accuracy or exhausting context windows, ensuring scalable and deterministic agentic workflows.
+Nexus-MCP resolves "Tool Space Interference" in Large Language Models by aggregating multiple MCP servers into a single gateway. Utilizing a strictly deterministic 4-phase workflow—Discovery, Mapping, Schema Verification, and Bridged Execution—it prevents context saturation and tool hallucinations, enabling the use of massive tool ecosystems without sacrificing reasoning accuracy.
 
 # Introduction
 
-While the integration of Gemini CLI and Google Antigravity with the Model Context Protocol (MCP) significantly expands the operational capabilities of LLM-based agents, it introduces a critical performance trade-off. As the number of available tools increases, Large Language Models (LLMs) experience a measurable decline in reasoning accuracy and tool-selection reliability.
+The integration of Gemini CLI and Google Antigravity with the Model Context Protocol (MCP) has significantly expanded the capabilities of LLM-based agents. However, this expansion introduces a critical performance bottleneck. As the number of available tools grows, Large Language Models (LLMs) suffer from a measurable decline in reasoning accuracy and tool-selection reliability.
 
-Research indicates that saturating the context window with tool definitions leads to "Tool Space Interference (TSI)," where semantic overlap and irrelevant metadata distract the model [Ref](https://www.microsoft.com/en-us/research/blog/tool-space-interference-in-the-mcp-era-designing-for-agent-compatibility-at-scale/). Current technical guidelines suggest a "soft limit" of approximately 20 functions to maintain high accuracy; exceeding this threshold often results in increased hallucination rates or failures in following complex instructions.
+Research identifies this phenomenon as "Tool Space Interference (TSI)." When an LLM's context window is saturated with excessive tool definitions, semantic overlap and irrelevant metadata distract the model [Ref](https://www.microsoft.com/en-us/research/blog/tool-space-interference-in-the-mcp-era-designing-for-agent-compatibility-at-scale/). Current technical guidelines suggest a "soft limit" of approximately 20 functions to maintain high accuracy. Exceeding this threshold often leads to increased hallucination rates and failures in executing complex instructions.
 
-The standard MCP workflow typically operates as follows:
-
-1. **Metadata Retrieval:** The MCP Client connects to the Server to retrieve names, descriptions, and JSON Schemas.
-2. **Context Injection:** This metadata is injected into the LLM's context window as 'Available Tool Definitions.'
-3. **Selection:** The AI performs a cross-entropy-based decision process to select and parameterize a Tool Call.
-
-**Nexus-MCP** addresses the scalability limits of this architecture by acting as an intelligent, unified gateway. Rather than exposing the entire toolset to the LLM—which triggers TSI and exhausts context—Nexus-MCP aggregates multiple MCP servers and employs a routing layer. This presents only the subset of tools contextually relevant to the specific user prompt. This modular approach preserves model performance by minimizing noise and optimizing information density, enabling the use of high-scale tool ecosystems without sacrificing precision.
+The standard MCP workflow operates by injecting all retrieved metadata (names, descriptions, JSON Schemas) directly into the context window. Nexus-MCP overcomes the scalability limits of this architecture by acting as an intelligent, unified gateway. Instead of exposing the entire toolset to the LLM—which triggers TSI—Nexus-MCP aggregates multiple MCP servers and employs a routing layer. This modular approach preserves model performance by minimizing noise and optimizing information density. The approach described in this article should be understood as one of several strategies for mitigating TSI.
 
 # Architecture and Workflow
 
 ![](images/fig1b.jpg)
 
-[Mermaid Chart Playground](https://mermaidchart.com/play?utm_source=mermaid_live_editor&utm_medium=share#pako:eNqNVMtu2zAQ_BWCpwS1DD8jW4cARtICOTQw6vRS-MJQa5koRap8BHaN_HuXpPxI6rjVQc-Z2dnhUjvKdQm0oBZ-eVAc7gWrDKuXiuDBvNPK189g0nPDjBNcNEw58t2eezurAM_MktlDuv8b8ggbbwMk3mRf7-ZkAeYlqCVwUM5ubyO9IA-q8Y7Mja6bViydH7UDopGW6nSSXEEWDhoyKMiT1pLcC8sDZps4EYnSLVQK6zKHONtKRkPH0t_AeaNIQETshfJt3WFbdwESuBNanVKYxOY1sV449iwh6lqy0l6VCXC0iB5CCgVZ0qc1EO6NCbkmBmdKaQyZrwW8oAwCKs1kd0mTDEgL0YYlokSaWAk4qXAxuBFe-RpqFpo3qM_ke2-H-CpwmQirk9lIyVbapDjJ1cxuFb8-KXoh2sS2R_CHXluT44J83gD3IWAylxiHUNV_0N-2etOu1UHqyJNaN7iGYUc4wc5CzuTBmZSxf3LlLTpqG7t-S3qfRPSgvcMcj0A4HYl_xZGHOK3H6VpsFU6DFfbDefoiFPZjEvzTSYwNxkhKcEzsdwN6oB1aGVHSwhkPHVqDqVl4pLsAWVIsVsOShjEtmfkZBvAVObjNf2hd72lG-2pNixXDuexQ35TM7X8zh7c43iWYO9wLjhb94TSK0GJHN7SYTLs3k3Gvnw8meW8wHPQ7dEuL4aA7yUfTcZ5P-tO8NxqNXjv0dyzbwy_j1z-ZCYk6)
+[Mermaid Chart Playground](https://mermaidchart.com/play?utm_source=mermaid_live_editor&utm_medium=share#pako:eNp1VNuK2zAQ_ZVBsKWFeIlzjx9actmWhbKEZim0zj6o9iQWkSUjyWmyJv9e2bJzaXb9Iktz5syco0tBIhkjCchG0SyB5_lKgP3u7mCRUI3gBzBnOpI7VAcXWhqqzMewGl4-ged9hu9Mm2cpuQ5nlHPgduqZcg47RkHgPtdeGmUvjuCErnIfxQ6FkeoQzhRSg4B7GpnzMsg1LFHZ-kBFDGUiCJqitmz_9doJYMGpEExsXORMUlaaCMoPrxjWIyyUTDNTsdrfTFqGBTUGldAwgQ8wrftt8CXHT1RsfXjYWwnFXLpGIKUmSi6KVQr44cvR5V_kWA54kk53aitq9odj-AMzqQw8U729WL7V1w1gGSWY0jd5f6EzdIkcIzMJ3dhIgkmtpg5X0G9oHKHbtw0aj4ksN56uVr21VG4f69wT3nlBOYvtjrkla4dtoA7rPKskmQTBWFmlFXXTV0kXfiz_Muti3W3xqE-NT4HuKOPUWtI4eoW91T4NHQCMPLNcyZ9ey3-H9WanbnakF8DDHqPcMPmuvqa30uLy9Ib2oMgtQmTnlbtvXpIG7VITjLbLPIpQ6-JUEOqVdc7P_l5C33P3bWTT54TzuRRYTBRCeSq0wUxDZO8KR4PxuVQNvKjSNH0Tb7i_MsF0Es6k0NL5BAp1zo2urqELv5CWfY1YTAKjcmyRFFVKyykpSuIVsacqxRUJ7G9M1XZFVuJoczIqfkuZNmlK5puEBGvKtZ3lWVltzqh9584QFDGqmcyFIUF_6FccJCjIngR-b3zvj7rtUbs97vn-sD1okQMJOl3_fjTq9Qd-dzTotPu9wbFFXquy_r3ftdDBeNhvD8a9Tn98_AeR2cLF)
 
-The Nexus-MCP workflow employs a **"Defensive and Deterministic"** architecture. It prioritizes operational reliability and schema-strictness over raw execution speed, effectively eliminating "hallucinated tool calls" through a mandatory multi-stage validation process.
+Nexus-MCP operates as a meta-server, utilizing `StdioClientTransport` to manage dynamic connections to downstream servers defined in a JSON configuration. It exposes four specialized core tools that enforce a "Defensive and Deterministic" workflow:
 
-1. **User Input:** The process begins when the user submits a specific prompt or objective.
-2. **Tool Discovery:** The agent invokes `list-tools` to identify available server functionalities via the gateway.
-3. **Tool Selection:** The agent selects necessary tools or terminates if capabilities are insufficient.
-4. **Schema Retrieval:** Detailed input schemas for selected tools are retrieved asynchronously to ensure technical compliance.
-5. **Execution Planning:** A logical, sequential plan is developed to execute tools in the optimal order.
-6. **Tool Execution:** Tools are called sequentially via `call-tool` using validated schemas.
-7. **Result Synthesis:** Final outputs are consolidated into a response, including the detailed execution plan.
+**1. Aggregated Discovery (`list-tools`)**
+Unlike standard discovery, this tool aggregates inventories from all connected servers into a single formatted list. Crucially, it injects "Search Hints" directly into the output. These hints guide the LLM to identify non-obvious tools for complex tasks—such as finding "PDF generation" via MIME types or locating "GAS" (Google Apps Script) capabilities—without requiring the model to guess tool names.
+
+**2. Server Introspection (`get-server-information`)**
+This tool provides high-level metadata about the connected ecosystem, allowing the agent to verify which server versions and tool sets are currently active before attempting any operations.
+
+**3. Surgical Schema Retrieval (`get-input-schema-for-tools`)**
+To prevent context saturation, Nexus-MCP does not broadcast input schemas by default. Instead, the agent must explicitly request the schema for a specific `server_name` and `tool_name`. This asynchronous retrieval ensures that only relevant technical constraints are loaded into the LLM's context.
+
+**4. Bridged Execution (`call-tool`)**
+Execution is strictly routed. The agent must provide the exact `server_name` and `tool_name` (validated against the discovery list). Nexus-MCP acts as a proxy, forwarding the request to the appropriate downstream server and returning the result to the agent.
+
+## The 4-Phase Algorithm
+
+To eliminate hallucinations, the system instructions enforce the following loop:
+
+1.  **Direct Discovery:** Call `list-tools` to build a literal registry of valid `[SERVER_ID]` and `[TOOL_ID]` pairs.
+2.  **Literal Mapping:** Analyze the prompt against the registry. If a requested capability is missing, the task is flagged as impossible immediately.
+3.  **Schema Verification:** Retrieve schemas only for the selected tools to validate parameters.
+4.  **Bridged Execution:** Execute the tools sequentially via the gateway.
 
 # Prerequisites and Installation
 
@@ -138,6 +145,8 @@ Create the JSON file (e.g., in your home directory) with the following content. 
 
 **Set Environment Variable**
 
+**This environment variable is used for both Gemini CLI and Antigravity.**
+
 Point Nexus-MCP to this configuration file. Replace `{your path}` with the full path to the file you just created.
 
 ```bash
@@ -192,7 +201,7 @@ Result: The agent identifies and utilizes 2 specific tools from `tools-for-mcp-s
 
 **Case Study 2: Calendar Management (Routing Control)**
 
-Since Google Calendar functionality exists in both extensions, you can direct the agent to use a specific backend.
+Since Google Calendar functionality exists in both extensions, you can direct the agent to use a specific backend by specifying the server name.
 
 Option A: Using Google Workspace
 
@@ -228,11 +237,11 @@ Result: The agent coordinated 3 different tools across both aggregated servers t
 
 ## Part 2: Testing with Google Antigravity
 
-Nexus-MCP can also be integrated into Google Antigravity for advanced agentic workflows.
+Nexus-MCP can also be integrated into Google Antigravity for advanced agentic workflows. In this article, the MCP servers installed as the Gemini CLI Extensions are used.
 
 **1. Set Rules**
 
-Launch Antigravity. Click the three dots (top right) and select **Customizations**. In the **Rules** section, paste the content of the `GEMINI.md` file included with the extension.
+Launch Antigravity. Click the three dots (top right) and select **Customizations**. In the **Rules** section, paste the content of the `GEMINI.md` file included with the extension. This step is crucial as it loads the system instructions that enforce the 4-Phase Algorithm (Discovery, Mapping, Schema, Execution).
 
 Command to read the file:
 
@@ -287,7 +296,7 @@ Write a comprehensive article about developing Google Apps Script (GAS) using ge
 
 ![](images/fig3d.jpg)
 
-**Implementation Plan:** Antigravity analyzes the request and builds a step-by-step plan.
+**Implementation Plan:** Antigravity analyzes the request and builds a step-by-step plan based on the keyword mapping rules (finding tools for PDF conversion and email).
 
 ![](images/fig3e.jpg)
 
@@ -313,12 +322,25 @@ The generated PDF confirms the content integrity.
 
 ![](images/fig3g.jpg)
 
+# IMPORTANT
+
+Performance can vary between model versions (e.g., gemini-3-pro vs. gemini-3-flash). In testing, the Gemini CLI occasionally reached the goal more reliably than Antigravity depending on the specific model used. If you encounter issues where the agent fails to reach the goal in Antigravity, try updating the system instruction (Rules) or refining the prompt to align more closely with the strategic keyword mapping defined in the system architecture.
+
 # Summary
 
 Nexus-MCP represents a significant advancement in managing large-scale tool ecosystems for LLMs. By abstracting the complexity of multiple servers behind a single gateway, it ensures that agents remain accurate and efficient even as their capabilities grow.
 
-- **Solves Tool Space Interference (TSI):** Prevents context window saturation by filtering irrelevant tool definitions.
-- **Unified Gateway Architecture:** Aggregates multiple MCP servers into a single access point, simplifying client configuration.
-- **Defensive & Deterministic:** Prioritizes strict schema validation and logical planning to eliminate tool hallucinations.
-- **Cross-Platform Compatibility:** Works seamlessly with both Gemini CLI and Google Antigravity.
-- **Complex Workflow Enablement:** Successfully coordinates multi-step tasks (e.g., create doc -> convert PDF -> email) across different tool providers.
+- **Solves Tool Space Interference (TSI):** Effectively prevents context window saturation and reduces model confusion by dynamically filtering irrelevant tool definitions.
+- **Unified Gateway Architecture:** Simplifies client configuration by aggregating multiple disparate MCP servers into a single access point.
+- **Defensive & Deterministic Logic:** Employs a mandatory 4-phase algorithm (Discovery, Mapping, Schema, Execution) to enforce strict literal matching and eliminate tool hallucinations.
+- **Cross-Platform Integration:** Provides seamless compatibility with major agentic platforms like Gemini CLI and Google Antigravity.
+- **Complex Workflow Orchestration:** Enables the coordination of sophisticated multi-step tasks (e.g., Doc -> PDF -> Email) across different providers with high reliability.
+
+# References
+
+1.  **Tool Space Interference Research:** [Microsoft Research Blog](https://www.microsoft.com/en-us/research/blog/tool-space-interference-in-the-mcp-era-designing-for-agent-compatibility-at-scale/)
+2.  **Nexus-MCP Extension:** [GitHub Repository](https://github.com/tanaikech/nexus-mcp-extension)
+3.  **ToolsForMCPServer Extension:** [GitHub Repository](https://github.com/tanaikech/ToolsForMCPServer-extension)
+4.  **Google Workspace Extension:** [GitHub Repository](https://github.com/gemini-cli-extensions/workspace)
+5.  **Gemini CLI:** [Official Documentation](https://github.com/google-gemini/gemini-cli)
+6.  **Google Antigravity:** [Official Site](https://antigravity.google/)
