@@ -371,7 +371,7 @@ Nexus-MCP represents a significant advancement in managing large-scale tool ecos
 
 # Update History
 
-- v1.0.0 (December 25, 2025)
+- v0.0.1 (December 25, 2025)
 
   1. Initial release.
 
