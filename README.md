@@ -1,3 +1,7 @@
+[![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENCE)
+
+<a name="top"></a>
+
 # Nexus-MCP: A Unified Gateway for Scalable and Deterministic MCP Server Aggregation
 
 # Abstract
@@ -346,3 +350,29 @@ Nexus-MCP represents a significant advancement in managing large-scale tool ecos
 4.  **Google Workspace Extension:** [GitHub Repository](https://github.com/gemini-cli-extensions/workspace)
 5.  **Gemini CLI:** [Official Documentation](https://github.com/google-gemini/gemini-cli)
 6.  **Google Antigravity:** [Official Site](https://antigravity.google/)
+
+---
+
+<a name="licence"></a>
+
+# Licence
+
+[MIT](LICENCE)
+
+<a name="author"></a>
+
+# Author
+
+[Tanaike](https://tanaikech.github.io/about/)
+
+[Donate](https://tanaikech.github.io/donate/)
+
+<a name="updatehistory"></a>
+
+# Update History
+
+- v1.0.0 (December 25, 2025)
+
+  1. Initial release.
+
+[TOP](#top)
