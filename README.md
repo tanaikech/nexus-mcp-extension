@@ -1,6 +1,4 @@
-title: Nexus-MCP: A Unified Gateway for Scalable and Deterministic MCP Server Aggregation
-
-![](images/fig1.jpg)
+# Nexus-MCP: A Unified Gateway for Scalable and Deterministic MCP Server Aggregation
 
 # Abstract
 
