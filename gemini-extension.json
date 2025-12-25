@@ -1,0 +1,12 @@
+{
+  "name": "nexus-mcp-extension",
+  "version": "0.0.1",
+  "contextFileName": "GEMINI.md",
+  "mcpServers": {
+    "nexus-mcp": {
+      "command": "node",
+      "args": ["${extensionPath}${/}mcp-server${/}src${/}nexus-mcp.js"],
+      "timeout": 300000
+    }
+  }
+}
